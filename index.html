@@ -1,0 +1,32 @@
+<script src="mark11.js"></script>
+
+<textarea id="t" style="font-family: monospace; font-size: 20px;  width: 500px; height: 500px;"></textarea>
+<br>
+<input type="button" value="run" onclick="run()">
+
+
+<script>
+var run = function (){
+  var code =  document.getElementById("t").value
+  mark11(code)
+}
+</script>
+
+<script type="mark11" id="code">
+say_hi:
+say hi
+
+say_hi_and_bye:
+say_hi
+say bye
+</script>
+
+<script>
+var main = function () {
+  var code = document.getElementById("code").innerHTML
+  var ret = mark11(code)
+  console.log(ret)
+}
+
+main()
+</script>
