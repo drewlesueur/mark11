@@ -17,13 +17,17 @@ var mark11 = function (code, _globals) {
   var lines = code.split("\n")
   var lines_length = lines.length
   var lookup_table = {}
+  var newI = 0;
   for (var i = 0; i < lines_length; i++) {
     var line = lines[i]
     line = mark11_trim(line);
-    var last_char = line.slice(-1)
-    if (last_char == ":") {
-      var key = line.slice(0, -1)
-      lookup_table[key] = i
+    if (line != "") {
+      var last_char = line.slice(-1)
+      if (last_char == ":") {
+        var key = line.slice(0, -1)
+        lookup_table[key] = newI
+      }
+      newI += 1
     }
   }
 
@@ -36,37 +40,43 @@ var mark11 = function (code, _globals) {
       new_lines.push(["return"])
     } else if (line.length){
       var words = line.split(" ")
-      var words_length = words.length
       var first_word = words[0]
       if (!mark11_commands[first_word]) {
         words.unshift("call")
       }
+      var words_length = words.length
       for (var j = 0; j < words_length; j++) {
         var word = words[j]
-        if (lookup_table[word]) {
+        var lookup_value = lookup_table[word]
+        if (lookup_value === 0 || lookup_value) {
           words[j] = lookup_table[word]
         }
       }
       new_lines.push(words)
     }
   }
-
+  new_lines.push(["return"])
+  console.log(lookup_table)
   console.log("new lines")
   console.log(new_lines)
   console.log(JSON.stringify(new_lines))
 
-  var new_lines_length = new_lines.length
-  var main = lookup_table["main"] || 0
+
+  _globals.line_index = (lookup_table["main"] + 1) || 0
+
   while (true) {
 
     var line = new_lines[_globals.line_index]
+    debugger
     mark11_eval_line(_globals, line) 
 
     if (_globals.should_stop) {
       break;
     }
-    console.log("all done!")
+
+    _globals.line_index += 1
   }
+  console.log("all done!")
   return _globals.ret;
 }
 
