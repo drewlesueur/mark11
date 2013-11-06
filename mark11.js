@@ -12,12 +12,22 @@ var mark11_globals = {
   ret: "yay!"
 }
 
+var mark11_new = function () {
+  return JSON.parse(JSON.stringify(mark11_globals))
+}
+
+var mark11_set_drawing_area = function (m11, canvasEl) {
+  var ctx = canvasEl.getContext("2d") 
+  m11.ctx = ctx
+  m11.canvas = canvasEl
+}
+
 function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
 var mark11 = function (code, _globals) {
-  var _globals = _globals || mark11_globals;
+  var _globals = _globals || mark11_new();
   var lines = code.split("\n")
   var lines_length = lines.length
   var lookup_table = {}
@@ -41,7 +51,7 @@ var mark11 = function (code, _globals) {
     line = mark11_trim(line);
     var last_char = line.slice(-1)
     if (last_char == ":") {
-      new_lines.push([{type: "sybmol", value: "return"}])
+      new_lines.push([{type: "symbol", value: "return"}])
     } else if (line.length){
       var words = line.split(" ")
       var first_word = words[0]
@@ -67,7 +77,7 @@ var mark11 = function (code, _globals) {
       new_lines.push(words)
     }
   }
-  new_lines.push(["return"])
+  new_lines.push([{type: "symbol", value:"return"}])
   console.log(lookup_table)
   console.log("new lines")
   console.log(new_lines)
@@ -78,7 +88,6 @@ var mark11 = function (code, _globals) {
   while (true) {
 
     var line = new_lines[_globals.line_index]
-    debugger
     mark11_eval_line(_globals, line) 
 
     if (_globals.should_stop) {
@@ -117,6 +126,16 @@ var mark11_eval_word = function (_globals, word) {
     //return word // keep it boxed
     return word.value //keep it unboxed
   }
+}
+
+var mark11_eval_words = function (m11, words) {
+  var ret = [];
+  for (var i = 0; i < words.length; i++) {
+    var word = words[i]
+    var evaled = mark11_eval_word(m11, word)
+    ret.push(evaled)
+  }  
+  return ret
 }
 
 var mark11_to_string_command = function (command){
@@ -166,6 +185,11 @@ var mark11_commands = {
     var arg = mark11_eval_word(_globals, args[0])
     console.log(arg)
     _globals.ret = arg
+  },
+  square: function (m11, args) {
+    var ctx = m11.ctx
+    args = mark11_eval_words(m11, args) 
+    ctx.fillRect(args[0], args[1], args[2], args[3]) 
   },
   call: function (_globals, args) {
     _globals.line_index_stack.push(_globals.line_index) 

@@ -1,5 +1,5 @@
 <script src="mark11.js"></script>
-
+<canvas id="canvas" width="500" height="500"></canvas>
 <textarea id="t" style="font-family: monospace; font-size: 20px;  width: 500px; height: 500px;"></textarea>
 <br>
 <input type="button" value="run" onclick="run()">
@@ -24,13 +24,18 @@ say_bye
 main:
 say_hi
 say done_with_main
+square 0 0 100 100
 
 </script>
 
 <script>
 var main = function () {
+  var canvasEl = document.getElementById("canvas")
+  
   var code = document.getElementById("code").innerHTML
-  var ret = mark11(code)
+  var m11 = mark11_new()
+  mark11_set_drawing_area(m11, canvasEl)
+  var ret = mark11(code, m11)
   console.log(ret)
 }
 
