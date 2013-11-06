@@ -12,6 +12,10 @@ var mark11_globals = {
   ret: "yay!"
 }
 
+function isNumber(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 var mark11 = function (code, _globals) {
   var _globals = _globals || mark11_globals;
   var lines = code.split("\n")
@@ -37,7 +41,7 @@ var mark11 = function (code, _globals) {
     line = mark11_trim(line);
     var last_char = line.slice(-1)
     if (last_char == ":") {
-      new_lines.push(["return"])
+      new_lines.push([{type: "sybmol", value: "return"}])
     } else if (line.length){
       var words = line.split(" ")
       var first_word = words[0]
@@ -49,8 +53,16 @@ var mark11 = function (code, _globals) {
         var word = words[j]
         var lookup_value = lookup_table[word]
         if (lookup_value === 0 || lookup_value) {
-          words[j] = lookup_table[word]
+          words[j] = {type: "number", value: lookup_table[word]}
+        } else if (word.substr(0, 1) == ":") {
+          words[j] = {type: "string", value: word.substr(1).replace(/_/g, " ") }
+        } else if (isNumber(word)) {
+          words[j] = {type: "number", value: word - 0}
+        } else {
+          // the first one really ins't a symbol it's a command
+          words[j] = {type: "symbol", value: word}
         }
+
       }
       new_lines.push(words)
     }
@@ -60,7 +72,6 @@ var mark11 = function (code, _globals) {
   console.log("new lines")
   console.log(new_lines)
   console.log(JSON.stringify(new_lines))
-
 
   _globals.line_index = (lookup_table["main"] + 1) || 0
 
@@ -80,20 +91,100 @@ var mark11 = function (code, _globals) {
   return _globals.ret;
 }
 
+var mark11_is_string_token = function (obj) {
+  return obj.type == "string"
+}
+
+var mark11_is_number_token = function (number){
+  return number.type == "number"
+}
+
+var mark11_is_symbol_token = function (number){
+  return number.type == "symbol"
+}
+
+// to box or not to box actual values
+
+var mark11_eval_word = function (_globals, word) {
+  if (word.type== "symbol") {
+    var value = _globals.scope[word.value]
+    if (value === 0 || value === false || value) {
+      return value      
+    } else {
+      return word.value
+    }
+  } else {
+    //return word // keep it boxed
+    return word.value //keep it unboxed
+  }
+}
+
+var mark11_to_string_command = function (command){
+  var ret = []
+  for (var i = 0; i < command.length; i++) {
+    var item = command[i]
+    if (item.type == "number" || item.type == "symbol") {
+      ret.push(item.value)
+    } else {
+      ret.push(":" + item.value.replace(/ /g, "_"))
+    }
+  }
+  return ret.join(" ")
+}
+
+var mark11_null_value = {}
+
 var mark11_commands = {
+  set: function (_globals, args) {
+    var name = args[0]   
+    var scope = _globals.scope
+    var cmd = args[1]
+    var args2 = cmd.slice(2) // todo: maybe less slicing, more passing in start index
+    mark11_commands[cmd](_globals, args2)
+    scope[name] = _globals.ret
+  },
+  setv: function (_globals, args) {
+    var name = args[0]   
+    var scope = _globals.scope
+    var val = scope[args[1]]
+    scope[name] = val
+  },
+  setv: function (_globals, args) {
+    var name = args[0]   
+    var scope = _globals.scope
+    var val = args[1]
+    scope[name] = val
+  },
+  setg: function (_globals, args) {
+    var name = args[0]   
+    var cmd = args[1]
+    var args2 = cmd.slice(2) // todo: maybe less slicing, more passing in start index
+    mark11_commands[cmd](_globals, args2)
+    _globals[name] = _globals.ret
+  },
   say: function (_globals, args) {
-    console.log(args[0])
+    var arg = mark11_eval_word(_globals, args[0])
+    console.log(arg)
+    _globals.ret = arg
   },
   call: function (_globals, args) {
     _globals.line_index_stack.push(_globals.line_index) 
     _globals.scope_stack.push(_globals.scope)
-    var where = args[0]
+
+    var where = mark11_eval_word(_globals, args[0])
+    var args2 = []
+    for (var i = 1; i < args.length; i++) {
+      var word = args[i]
+      var evaled_word = mark11_eval_word(_globals, word)
+      args2.push(evaled_word) 
+    }
+
     _globals.line_index = where
     _globals.scope = {}
   },
   "goto": function (_globals, args) {
     var where = args[0]
-    _globals.line_index = where
+    _globals.line_index = mark11_eval_word(_globals, where)
   },
   "return": function (_globals, args) {
     _globals.line_index = _globals.line_index_stack.pop()
@@ -116,7 +207,7 @@ var mark11_commands = {
 }
 
 var mark11_eval_line = function (_globals, line) {
-  var command_id = line[0] 
+  var command_id = line[0].value
   var args = line.slice(1)
 
   var command = mark11_commands[command_id];
