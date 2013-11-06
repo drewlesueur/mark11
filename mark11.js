@@ -155,32 +155,17 @@ var mark11_to_string_command = function (command){
 var mark11_null_value = {}
 
 var mark11_commands = {
-  set: function (_globals, args) {
-    var name = args[0]   
-    var scope = _globals.scope
-    var cmd = args[1]
-    var args2 = cmd.slice(2) // todo: maybe less slicing, more passing in start index
-    mark11_commands[cmd](_globals, args2)
-    scope[name] = _globals.ret
-  },
-  setv: function (_globals, args) {
-    var name = args[0]   
-    var scope = _globals.scope
-    var val = scope[args[1]]
-    scope[name] = val
-  },
-  setv: function (_globals, args) {
-    var name = args[0]   
-    var scope = _globals.scope
-    var val = args[1]
-    scope[name] = val
-  },
-  setg: function (_globals, args) {
-    var name = args[0]   
-    var cmd = args[1]
-    var args2 = cmd.slice(2) // todo: maybe less slicing, more passing in start index
-    mark11_commands[cmd](_globals, args2)
-    _globals[name] = _globals.ret
+  add: function (m11, args) {
+    args = mark11_eval_words(m11, args)
+    var sum = 0;
+    args.forEach(function (arg) {
+      sum += arg
+    })
+    return sum
+  }, 
+  as: function (m11, args) {
+    m11.scope[args[0].value] = m11.ret
+    return m11.ret
   },
   say: function (_globals, args) {
     var arg = mark11_eval_word(_globals, args[0])
@@ -221,6 +206,7 @@ var mark11_commands = {
     if (!_globals.scope) {
       _globals.should_stop = true;
     }
+    return _globals.ret
   },
   "if": function (_globals, args) {
     var a = _globals.scope[args[0]]
@@ -240,7 +226,8 @@ var mark11_eval_line = function (_globals, line) {
 
   var command = mark11_commands[command_id];
   if (command) {
-    command(_globals, args)
+    var ret = command(_globals, args)
+    _globals.ret = ret 
   } else {
     
   }
