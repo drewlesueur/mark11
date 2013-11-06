@@ -128,9 +128,10 @@ var mark11_eval_word = function (_globals, word) {
   }
 }
 
-var mark11_eval_words = function (m11, words) {
+var mark11_eval_words = function (m11, words, start) {
+  var start = start || 0
   var ret = [];
-  for (var i = 0; i < words.length; i++) {
+  for (var i = start; i < words.length; i++) {
     var word = words[i]
     var evaled = mark11_eval_word(m11, word)
     ret.push(evaled)
@@ -189,6 +190,9 @@ var mark11_commands = {
   square: function (m11, args) {
     var ctx = m11.ctx
     args = mark11_eval_words(m11, args) 
+    if (args[4]) {
+      ctx.fillStyle = args[4]
+    }
     ctx.fillRect(args[0], args[1], args[2], args[3]) 
   },
   call: function (_globals, args) {
@@ -196,15 +200,15 @@ var mark11_commands = {
     _globals.scope_stack.push(_globals.scope)
 
     var where = mark11_eval_word(_globals, args[0])
-    var args2 = []
-    for (var i = 1; i < args.length; i++) {
-      var word = args[i]
-      var evaled_word = mark11_eval_word(_globals, word)
-      args2.push(evaled_word) 
-    }
+    var args2 = mark11_eval_words(_globals, args, 1)
 
     _globals.line_index = where
-    _globals.scope = {}
+    var scope = {}
+    _globals.scope = scope
+    scope.a = args2[0]
+    scope.b = args2[1]
+    scope.c = args2[2]
+    scope.d = args2[3]
   },
   "goto": function (_globals, args) {
     var where = args[0]
