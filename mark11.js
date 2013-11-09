@@ -172,7 +172,7 @@ var mark11_commands = {
     console.log(arg)
     _globals.ret = arg
   },
-  square: function (m11, args) {
+  rect: function (m11, args) {
     var ctx = m11.ctx
     args = mark11_eval_words(m11, args) 
     if (args[4]) {
