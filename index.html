@@ -51,18 +51,19 @@ fake_sum 10 5
 as fifteen
 dot 90 fifteen :magenta
 
-
-
+rpush people :drew :aimee
+say people
 
 
 </script>
 
 <script>
+var m11
 var main = function () {
   var canvasEl = document.getElementById("canvas")
   
   var code = document.getElementById("code").innerHTML
-  var m11 = mark11_new()
+  m11 = mark11_new()
   mark11_set_drawing_area(m11, canvasEl)
   var ret = mark11(code, m11)
   console.log(ret)

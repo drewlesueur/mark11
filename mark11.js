@@ -172,6 +172,9 @@ var mark11_commands = {
     console.log(arg)
     _globals.ret = arg
   },
+  "debugger": function (m11, args) {
+    debugger
+  },
   rect: function (m11, args) {
     var ctx = m11.ctx
     args = mark11_eval_words(m11, args) 
@@ -179,6 +182,76 @@ var mark11_commands = {
       ctx.fillStyle = args[4]
     }
     ctx.fillRect(args[0], args[1], args[2], args[3]) 
+  },
+  hash: function (m11, args) {
+    var ret = {}
+    m11.scope[args[0]] = {}
+    m11.ret = ret
+  },
+  list: function (m11, args) {
+    var ret = []
+    m11.scope[args[0]] = []
+    m11.ret = ret
+  },
+  lget: function (m11, args) {
+    var varname = args[0] 
+    var fieldname = args[1] 
+    var list = m11.scope[varname]
+    if (!list) {
+      m11.ret = null 
+    } else {
+      var ret = list[fieldname]
+      m11.ret = ret
+    }
+  },
+  hget: function (m11, args) {
+    var varname = args[0] 
+    var fieldname = args[1] 
+    var hash = m11.scope[varname]
+    if (!hash) {
+      m11.ret = null
+    } else {
+      var ret = m11.scope[varname][fieldname]
+      m11.ret = ret
+    }
+  },
+  set: function (m11, args) {
+    var varname = args[0] //note the name is not dynamic. 
+    var varvalue = mark11_eval_word(args[1]) 
+    m11.scope[varname] = varvalue 
+  },
+  rpush: function (m11, args) {
+    debugger
+    var evaled = mark11_eval_words(m11, args, 1)
+    var list = mark11_setup_var(m11, args, [])
+    for (var i = 0; i < evaled.length; i ++) {
+      list.push(evaled[i])
+    }
+    m11.ret = list
+  },
+  lset: function (m11, args) {
+    var varname = args[0] //note the name is not dynamic. 
+    var fieldname = mark11_eval_word(args[1])
+    var varvalue = mark11_eval_word(args[2]) 
+    var list = m11.scope[varname]
+    if (!list) {
+      list = []
+      m11.scope[varname] = list
+    }
+    list[fieldname] = varvalue
+    m11.ret = varvalue
+  },
+  hset: function (m11, args) {
+    var varname = args[0] //note the name is not dynamic. 
+    var fieldname = mark11_eval_word(args[1])
+    var varvalue = mark11_eval_word(args[2]) 
+    var hash = m11.scope[varname]
+    if (!hash) {
+      hash = {}
+      m11.scope[varname] = hash
+    }
+    hash[fieldname] = varvalue
+    m11.ret = varvalue
   },
   call: function (_globals, args) {
     _globals.line_index_stack.push(_globals.line_index) 
@@ -231,6 +304,16 @@ var mark11_eval_line = function (_globals, line) {
   } else {
     
   }
+}
+
+var mark11_setup_var = function (m11, args, default_) {
+  var name = args[0].value // because it's a "symbol"
+  var value = m11.scope[name]
+  if (!value) {
+    value = default_
+    m11.scope[name] = value
+  }
+  return value
 }
 
 /*
