@@ -1,3 +1,6 @@
+// think about wrapping values
+// think about passing in a container for what you want to return
+
 var mark11_trim =  function (s) { // taken from http://jsperf.com/mega-trim-test
   var str = s.match(/\S+(?:\s+\S+)*/);
   return str ? str[0] : '';
@@ -170,7 +173,7 @@ var mark11_commands = {
   say: function (_globals, args) {
     var arg = mark11_eval_word(_globals, args[0])
     console.log(arg)
-    _globals.ret = arg
+    return arg
   },
   "debugger": function (m11, args) {
     debugger
@@ -186,22 +189,22 @@ var mark11_commands = {
   hash: function (m11, args) {
     var ret = {}
     m11.scope[args[0]] = {}
-    m11.ret = ret
+    return ret
   },
   list: function (m11, args) {
     var ret = []
     m11.scope[args[0]] = []
-    m11.ret = ret
+    return ret
   },
   lget: function (m11, args) {
     var varname = args[0] 
     var fieldname = args[1] 
     var list = m11.scope[varname]
     if (!list) {
-      m11.ret = null 
+      return null
     } else {
       var ret = list[fieldname]
-      m11.ret = ret
+      return ret
     }
   },
   hget: function (m11, args) {
@@ -209,25 +212,39 @@ var mark11_commands = {
     var fieldname = args[1] 
     var hash = m11.scope[varname]
     if (!hash) {
-      m11.ret = null
+      //m11.ret = null
+      return null
     } else {
       var ret = m11.scope[varname][fieldname]
-      m11.ret = ret
+      //m11.ret = ret
+      return ret
     }
   },
+  eq: function (m11, args) {
+    var evaled = mark11_eval_words(m11, args);
+    return (evaled[0] == evaled[1])
+  },
+  cat: function (m11, args) {
+    var evaled = mark11_eval_words(m11, args);
+    return evaled.join("")
+  },
+  cats: function (m11, args) {
+    var evaled = mark11_eval_words(m11, args);
+    return evaled.join(" ")
+  },
   set: function (m11, args) {
-    var varname = args[0] //note the name is not dynamic. 
-    var varvalue = mark11_eval_word(args[1]) 
+    var varname = args[0].value //note the name is not dynamic. 
+    var varvalue = mark11_eval_word(m11, args[1]) 
     m11.scope[varname] = varvalue 
+    return varvalue
   },
   rpush: function (m11, args) {
-    debugger
     var evaled = mark11_eval_words(m11, args, 1)
     var list = mark11_setup_var(m11, args, [])
     for (var i = 0; i < evaled.length; i ++) {
       list.push(evaled[i])
     }
-    m11.ret = list
+    return list
   },
   lset: function (m11, args) {
     var varname = args[0] //note the name is not dynamic. 
@@ -239,7 +256,7 @@ var mark11_commands = {
       m11.scope[varname] = list
     }
     list[fieldname] = varvalue
-    m11.ret = varvalue
+    return varvalue
   },
   hset: function (m11, args) {
     var varname = args[0] //note the name is not dynamic. 
@@ -251,7 +268,7 @@ var mark11_commands = {
       m11.scope[varname] = hash
     }
     hash[fieldname] = varvalue
-    m11.ret = varvalue
+    return varvalue
   },
   call: function (_globals, args) {
     _globals.line_index_stack.push(_globals.line_index) 
