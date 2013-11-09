@@ -31,7 +31,7 @@ function isNumber(n) {
 
 var mark11 = function (code, _globals) {
   var _globals = _globals || mark11_new();
-  var lines = code.split("\n")
+  var lines = code.split(/\n|;/)
   var lines_length = lines.length
   var lookup_table = {}
   var newI = 0;
