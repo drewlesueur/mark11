@@ -1,6 +1,7 @@
 // think about wrapping values
 // think about passing in a container for what you want to return
 // goto, call, and if with number, varname of number, and varname of closureish
+// need to have default lib written in m11 itself. (m11 is just a temporary name now I think)
 
 var mark11_trim =  function (s) { // taken from http://jsperf.com/mega-trim-test
   var str = s.match(/\S+(?:\s+\S+)*/);
@@ -195,6 +196,14 @@ var mark11_commands = {
       ctx.fillStyle = args[4]
     }
     ctx.fillRect(args[0], args[1], args[2], args[3]) 
+  },
+  square: function (m11, args) {
+    var ctx = m11.ctx
+    args = mark11_eval_words(m11, args) 
+    if (args[3]) {
+      ctx.fillStyle = args[3]
+    }
+    ctx.fillRect(args[0], args[1], args[2], args[2]) 
   },
   circle: function (m11, args) {
     var ctx = m11.ctx

@@ -1,0 +1,123 @@
+<script src="mark11.js"></script>
+<canvas id="canvas" width="500" height="500"></canvas>
+<textarea id="t" style="font-family: monospace; font-size: 20px;  width: 500px; height: 500px;"></textarea>
+<br>
+<input type="button" value="run" onclick="run()">
+
+
+<script>
+var run = function (){
+  var code =  document.getElementById("t").value
+  mark11(code)
+}
+</script>
+
+<script type="mark11" id="code">
+say_bye:
+say Good_bye!
+
+say_hi:
+  say TESTING
+  say Other stuff
+  say_bye
+
+dot:
+rect a b 10 10 c
+
+get_25:
+add 20 5
+
+fake_sum:
+add a b
+
+add7:; add a 7
+
+
+main:
+  say_hi
+  say done_with_main
+  rect 0 0 100 100 :blue
+  rect 10 10 15 15 :red
+  dot 40 40 :pink
+  dot 55 40 :black
+
+  add 60 5
+  as sixty_five
+  dot sixty_five sixty_five :cyan
+
+  get_25
+  as tf
+
+  dot tf 70 :lime
+
+  fake_sum 10 5
+  as fifteen
+  dot 90 fifteen :magenta
+
+  rpush people :drew :aimee
+  say people
+
+  rpush numbers 1 2 3 4
+
+  set name :Drew_LeSueur
+  say name
+
+  eq 3 4; as should_be_false
+  cats :three_=_four_is should_be_false
+  as msg
+  say msg
+
+  add7 20; as ts; say ts
+
+  rect 200 100 50 50 :orange; dot 200 100 :black
+
+  set f 4
+  eq f 4; as should_be_true;
+  cats :four_=_four_is should_be_true
+
+  if should_be_false say_its_true_bad say_its_false_good
+
+  if should_be_true say_its_true_good say_its_false_bad
+
+  circle 100 100 20 :orange
+  loop_test 
+
+loop_test:
+loop 0 50 say_hi
+
+loop:
+set start a
+set end b
+set func c
+
+
+
+
+say_its_false_good:
+  say :its_false_and_should_be
+
+say_its_true_bad:
+say :its_true_and_shouldnt_be
+
+say_its_false_bad:
+say :its_false_and_shouldnt_be
+
+say_its_true_good:
+say :its_true_and_should_be
+
+</script>
+
+<script>
+var m11
+var main = function () {
+  var canvasEl = document.getElementById("canvas")
+  
+  var code = document.getElementById("code").innerHTML
+  m11 = mark11_new()
+  mark11_set_drawing_area(m11, canvasEl)
+  var ret = mark11(code, m11)
+  console.log(ret)
+}
+
+main()
+</script>
