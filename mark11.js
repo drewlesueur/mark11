@@ -180,6 +180,11 @@ var mark11_commands = {
     console.log(arg)
     return arg
   },
+  alert: function (m11, args) {
+    var arg = mark11_eval_word(m11, args[0])
+    alert(arg)
+    return arg
+  },
   "debugger": function (m11, args) {
     debugger
   },

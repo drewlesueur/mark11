@@ -32,6 +32,7 @@ add a b
 
 add7:; add a 7
 
+
 main:
   say_hi
   say done_with_main
@@ -79,6 +80,18 @@ main:
   if should_be_true say_its_true_good say_its_false_bad
 
   circle 100 100 20 :orange
+  loop_test 
+
+loop_test:
+loop 0 50 say_hi
+
+loop:
+set start a
+set end b
+set func c
+
+
+
 
 say_its_false_good:
   say :its_false_and_should_be
