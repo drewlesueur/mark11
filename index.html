@@ -61,13 +61,34 @@ rpush numbers 1 2 3 4
 set name :Drew_LeSueur
 say name
 
-eq 3 4
-as should_be_false
-cats :three_plus_four_is should_be_false
+eq 3 4; as should_be_false
+cats :three_=_four_is should_be_false
 as msg
 say msg
 
 add7 20; as ts; say ts
+
+rect 200 100 50 50 :orange; dot 200 100 :black
+
+set f 4
+eq f 4; as should_be_true;
+cats :four_=_four_is should_be_true
+
+if should_be_false say_its_true_bad say_its_false_good
+
+if should_be_true say_its_true_good say_its_false_bad
+
+say_its_false_good:
+say :its_false_and_should_be
+
+say_its_true_bad:
+say :its_true_and_shouldnt_be
+
+say_its_false_bad:
+say :its_false_and_shouldnt_be
+
+say_its_true_good:
+say :its_true_and_should_be
 
 
 </script>
