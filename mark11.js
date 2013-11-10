@@ -32,8 +32,8 @@ function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-var mark11 = function (code, _globals) {
-  var _globals = _globals || mark11_new();
+var mark11 = function (code, m11) {
+  var m11 = m11 || mark11_new();
   var lines = code.split(/\n|;/)
   var lines_length = lines.length
   var lookup_table = {}
@@ -89,22 +89,22 @@ var mark11 = function (code, _globals) {
   console.log(new_lines)
   console.log(JSON.stringify(new_lines))
 
-  _globals.line_index = (lookup_table["main"] + 1) || 0
-  _globals.lines = new_lines
+  m11.line_index = (lookup_table["main"] + 1) || 0
+  m11.lines = new_lines
   while (true) {
 
-    var line = new_lines[_globals.line_index]
-    _globals.line = line
-    mark11_eval_line(_globals, line) 
+    var line = new_lines[m11.line_index]
+    m11.line = line
+    mark11_eval_line(m11, line) 
 
-    if (_globals.should_stop) {
+    if (m11.should_stop) {
       break;
     }
 
-    _globals.line_index += 1
+    m11.line_index += 1
   }
   console.log("all done!")
-  return _globals.ret;
+  return m11.ret;
 }
 
 var mark11_is_string_token = function (obj) {
@@ -121,9 +121,9 @@ var mark11_is_symbol_token = function (number){
 
 // to box or not to box actual values
 
-var mark11_eval_word = function (_globals, word) {
+var mark11_eval_word = function (m11, word) {
   if (word.type== "symbol") {
-    var value = _globals.scope[word.value]
+    var value = m11.scope[word.value]
     if (value === 0 || value === false || value) {
       return value      
     } else {
@@ -174,8 +174,8 @@ var mark11_commands = {
     m11.scope[args[0].value] = m11.ret
     return m11.ret
   },
-  say: function (_globals, args) {
-    var arg = mark11_eval_word(_globals, args[0])
+  say: function (m11, args) {
+    var arg = mark11_eval_word(m11, args[0])
     console.log(arg)
     return arg
   },
@@ -274,26 +274,26 @@ var mark11_commands = {
     hash[fieldname] = varvalue
     return varvalue
   },
-  call: function (_globals, args) {
-    _globals.line_index_stack.push(_globals.line_index) 
-    _globals.scope_stack.push(_globals.scope)
-    _globals.scope_type_stack.push(_globals.scope_type)
+  call: function (m11, args) {
+    m11.line_index_stack.push(m11.line_index) 
+    m11.scope_stack.push(m11.scope)
+    m11.scope_type_stack.push(m11.scope_type)
 
-    var where = mark11_eval_word(_globals, args[0])
-    var args2 = mark11_eval_words(_globals, args, 1)
+    var where = mark11_eval_word(m11, args[0])
+    var args2 = mark11_eval_words(m11, args, 1)
 
-    _globals.line_index = where
+    m11.line_index = where
     var scope = {}
-    _globals.scope = scope
-    _globals.scope_type = "call"
+    m11.scope = scope
+    m11.scope_type = "call"
     scope.a = args2[0]
     scope.b = args2[1]
     scope.c = args2[2]
     scope.d = args2[3]
   },
-  "goto": function (_globals, args) {
-    var where = mark11_eval_word(_globals, args[0])
-    _globals.line_index = mark11_eval_word(_globals, where)
+  "goto": function (m11, args) {
+    var where = mark11_eval_word(m11, args[0])
+    m11.line_index = mark11_eval_word(m11, where)
   },
   "callnoscope": function (m11, args) {
     m11.line_index_stack.push(m11.line_index) 
@@ -308,21 +308,20 @@ var mark11_commands = {
     scope.c = args2[2]
     scope.d = args2[3]
   },
-  "return": function (_globals, args) {
-    _globals.line_index = _globals.line_index_stack.pop()
-    if (_globals.scope_type == "call") {
-      _globals.scope = _globals.scope_stack.pop()
+  "return": function (m11, args) {
+    m11.line_index = m11.line_index_stack.pop()
+    if (m11.scope_type == "call") {
+      m11.scope = m11.scope_stack.pop()
     }
-    _globals.scope_type = _globals.scope_type_stack.pop()
+    m11.scope_type = m11.scope_type_stack.pop()
 
-    if (!_globals.scope) {
-      _globals.should_stop = true;
+    if (!m11.scope) {
+      m11.should_stop = true;
     }
-    return _globals.ret
+    return m11.ret
   },
   "if": function (m11, args) {
     var condition = mark11_eval_word(m11, args[0])
-    debugger
     if (condition) {
       m11.line_index_stack.push(m11.line_index) 
       m11.scope_type_stack.push(m11.scope_type)
@@ -339,14 +338,14 @@ var mark11_commands = {
   }
 }
 
-var mark11_eval_line = function (_globals, line) {
+var mark11_eval_line = function (m11, line) {
   var command_id = line[0].value
   var args = line.slice(1)
 
   var command = mark11_commands[command_id];
   if (command) {
-    var ret = command(_globals, args)
-    _globals.ret = ret 
+    var ret = command(m11, args)
+    m11.ret = ret 
   } else {
     
   }
