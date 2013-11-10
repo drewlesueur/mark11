@@ -37,6 +37,7 @@ var mark11 = function (code, m11) {
   var lines = code.split(/\n|;/)
   var lines_length = lines.length
   var lookup_table = {}
+  m11.lookup_table = lookup_table
   var newI = 0;
   for (var i = 0; i < lines_length; i++) {
     var line = lines[i]
@@ -189,6 +190,21 @@ var mark11_commands = {
       ctx.fillStyle = args[4]
     }
     ctx.fillRect(args[0], args[1], args[2], args[3]) 
+  },
+  circle: function (m11, args) {
+    var ctx = m11.ctx
+    args = mark11_eval_words(m11, args) 
+    if (args[3]) {
+      ctx.fillStyle = args[3]
+    }
+    ctx.beginPath();
+    var x = args[0]
+    var y = args[1]
+    var r = args[2]
+    ctx.arc(x, y, r, 0, Math.PI*2, true); 
+    ctx.closePath();
+    ctx.fill();
+
   },
   hash: function (m11, args) {
     var ret = {}
