@@ -13,6 +13,7 @@
 #code-text {
   width: 100%;
   height: 1200px;
+  white-space: nowrap;
 }
 
 #canvas {
@@ -49,9 +50,9 @@ circle 100 100 25 :red
 <script>
 var m11
 var main = function () {
-  debugger
   var canvasEl = document.getElementById("canvas")
   var code = document.getElementById("code-text").value
+  localStorage.code = code
   m11 = mark11_new()
   mark11_set_drawing_area(m11, canvasEl)
   var ret = mark11(code, m11)
@@ -64,6 +65,10 @@ var run = function () {
 
 window.onerror = function (e) {
   alert(e)
+}
+
+if (localStorage.code) {
+  document.getElementById("code-text").value = localStorage.code
 }
 
 main()
