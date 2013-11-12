@@ -80,18 +80,28 @@ main:
   if should_be_true say_its_true_good say_its_false_bad
 
   circle 100 100 20 :orange
-  loop_test 
-
-loop_test:
-loop 0 50 say_hi
+  
+  loop 0 10 loop_it
+  say :done_with_loopage!
 
 loop:
-set start a
-set end b
-set func c
+  set i a
+  set max b
+  set fn c
+  callnoscope fn i
+
+  eq i max; as is_done
+  if is_done loop_done loop_not_done
+
+loop_done:
+
+loop_not_done:
+add i 1; as i
+loop i max fn
 
 
-
+loop_it:
+  log a
 
 say_its_false_good:
   say :its_false_and_should_be

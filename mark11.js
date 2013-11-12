@@ -258,6 +258,22 @@ var mark11_commands = {
     var evaled = mark11_eval_words(m11, args);
     return (evaled[0] == evaled[1])
   },
+  lt: function (m11, args) {
+    var evaled = mark11_eval_words(m11, args);
+    return (evaled[0] < evaled[1])
+  },
+  lte: function (m11, args) {
+    var evaled = mark11_eval_words(m11, args);
+    return (evaled[0] <= evaled[1])
+  },
+  gte: function (m11, args) {
+    var evaled = mark11_eval_words(m11, args);
+    return (evaled[0] >= evaled[1])
+  },
+  gt: function (m11, args) {
+    var evaled = mark11_eval_words(m11, args);
+    return (evaled[0] > evaled[1])
+  },
   cat: function (m11, args) {
     var evaled = mark11_eval_words(m11, args);
     return evaled.join("")
@@ -333,10 +349,10 @@ var mark11_commands = {
     var args2 = mark11_eval_words(m11, args, 1)
     m11.line_index = where
     m11.scope_type = "callnoscope"
-    scope.a = args2[0]
-    scope.b = args2[1]
-    scope.c = args2[2]
-    scope.d = args2[3]
+    m11.scope.a = args2[0]
+    m11.scope.b = args2[1]
+    m11.scope.c = args2[2]
+    m11.scope.d = args2[3]
   },
   "return": function (m11, args) {
     m11.line_index = m11.line_index_stack.pop()
@@ -365,8 +381,17 @@ var mark11_commands = {
       m11.line_index = where
       m11.scope_type = "callnoscope"
     }
-  }
+  },
+  // cancel this, just doing loops in 'mark11' code
+  //"loop": function (m11, args) { 
+  //  var evaled = mark11_eval_words(m11, args)
+  //  var where = evaled[2]
+  //  for (var i = evaled[0]; i < evaled[1]; i++) {
+  //    m11.line_index = mark11_eval_word(m11, where)
+  //  }
+  //}
 }
+mark11_commands.log = mark11_commands.say
 
 var mark11_eval_line = function (m11, line) {
   var command_id = line[0].value
