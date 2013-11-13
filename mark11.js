@@ -83,7 +83,8 @@ var mark11 = function (code, m11) {
     line = mark11_trim(line);
     var last_char = line.slice(-1)
     if (last_char == ":") {
-      new_lines.push([{type: "symbol", value: "return"}])
+      //new_lines.push([{type: "symbol", value: "return"}])
+      new_lines.push([mark11_commands["return"]])
     } else if (line.length){
       var words = line.split(" ")
       var first_word = words[0]
@@ -106,10 +107,12 @@ var mark11 = function (code, m11) {
         }
 
       }
+      words[0] = mark11_commands[words[0].value] // yo
       new_lines.push(words)
     }
   }
-  new_lines.push([{type: "symbol", value:"return"}])
+  //new_lines.push([{type: "symbol", value:"return"}])
+  new_lines.push([mark11_commands["return"]])
   console.log(lookup_table)
   console.log("new lines")
   console.log(new_lines)
@@ -417,16 +420,13 @@ var mark11_commands = {
 mark11_commands.log = mark11_commands.say
 
 var mark11_eval_line = function (m11, line) {
-  var command_id = line[0].value
   //var args = line.slice(1) // todo: maybe optimize this so you can just pass the whole args
 
-  var command = mark11_commands[command_id];
-  if (command) {
-    var ret = command(m11, line)
-    m11.ret = ret 
-    if (m11.scope) {
-      m11.scope.it = ret
-    }
+  var command = line[0]
+  var ret = command(m11, line)
+  m11.ret = ret 
+  if (m11.scope) {
+    m11.scope.it = ret
   }
 }
 
