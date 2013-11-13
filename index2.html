@@ -84,22 +84,6 @@ main:
   loop 0 10 loop_it
   say :done_with_loopage!
 
-loop:
-  set i a
-  set max b
-  set fn c
-  callnoscope fn i
-
-  eq i max; as is_done
-  if is_done loop_done loop_not_done
-
-loop_done:
-
-loop_not_done:
-add i 1; as i
-loop i max fn
-
-
 loop_it:
   log a
 

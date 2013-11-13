@@ -33,8 +33,32 @@ function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
+var mark11_add_built_in_libraries = function (code) {
+ code = code
+  + "loop:\n"
+  + "set i a\n"
+  + "set max b\n"
+  + "set fn c\n"
+  + "add max -1; as max\n"
+  + "goto loop_internal\n"
+  + "\n"
+  + "loop_internal:\n"
+  + "  callnoscope fn i\n"
+  + "\n"
+  + "  eq i max; as is_done\n"
+  + "  if is_done loop_done loop_not_done\n"
+  + "\n"
+  + "loop_done:\n"
+  + "\n"
+  + "loop_not_done:\n"
+  + "  add i 1; as i\n"
+  + "  goto loop_internal\n"
+ return code
+}
+
 var mark11 = function (code, m11) {
   var m11 = m11 || mark11_new();
+  var code = mark11_add_built_in_libraries(code)
   var lines = code.split(/\n|;/)
   var lines_length = lines.length
   var lookup_table = {}
@@ -339,7 +363,7 @@ var mark11_commands = {
   },
   "goto": function (m11, args) {
     var where = mark11_eval_word(m11, args[0])
-    m11.line_index = mark11_eval_word(m11, where)
+    m11.line_index = where
   },
   "callnoscope": function (m11, args) {
     m11.line_index_stack.push(m11.line_index) 
@@ -395,7 +419,7 @@ mark11_commands.log = mark11_commands.say
 
 var mark11_eval_line = function (m11, line) {
   var command_id = line[0].value
-  var args = line.slice(1)
+  var args = line.slice(1) // todo: maybe optimize this so you can just pass the whole args
 
   var command = mark11_commands[command_id];
   if (command) {
