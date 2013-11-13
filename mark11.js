@@ -189,24 +189,28 @@ var mark11_null_value = {}
 
 var mark11_commands = {
   add: function (m11, args) {
-    args = mark11_eval_words(m11, args)
+    args = mark11_eval_words(m11, args, 1)
     var sum = 0;
     args.forEach(function (arg) {
       sum += arg
     })
     return sum
   }, 
+  subtr: function (m11, args) {
+    args = mark11_eval_words(m11, args, 1)
+    return args[0] - args[1]
+  },
   as: function (m11, args) {
-    m11.scope[args[0].value] = m11.ret
+    m11.scope[args[1].value] = m11.ret
     return m11.ret
   },
   say: function (m11, args) {
-    var arg = mark11_eval_word(m11, args[0])
+    var arg = mark11_eval_word(m11, args[1])
     console.log(arg)
     return arg
   },
   alert: function (m11, args) {
-    var arg = mark11_eval_word(m11, args[0])
+    var arg = mark11_eval_word(m11, args[1])
     alert(arg)
     return arg
   },
@@ -215,7 +219,7 @@ var mark11_commands = {
   },
   rect: function (m11, args) {
     var ctx = m11.ctx
-    args = mark11_eval_words(m11, args) 
+    args = mark11_eval_words(m11, args, 1) 
     if (args[4]) {
       ctx.fillStyle = args[4]
     }
@@ -223,7 +227,7 @@ var mark11_commands = {
   },
   square: function (m11, args) {
     var ctx = m11.ctx
-    args = mark11_eval_words(m11, args) 
+    args = mark11_eval_words(m11, args, 1) 
     if (args[3]) {
       ctx.fillStyle = args[3]
     }
@@ -231,7 +235,7 @@ var mark11_commands = {
   },
   circle: function (m11, args) {
     var ctx = m11.ctx
-    args = mark11_eval_words(m11, args) 
+    args = mark11_eval_words(m11, args, 1) 
     if (args[3]) {
       ctx.fillStyle = args[3]
     }
@@ -246,17 +250,17 @@ var mark11_commands = {
   },
   hash: function (m11, args) {
     var ret = {}
-    m11.scope[args[0]] = {}
+    m11.scope[args[1]] = {}
     return ret
   },
   list: function (m11, args) {
     var ret = []
-    m11.scope[args[0]] = []
+    m11.scope[args[1]] = []
     return ret
   },
   lget: function (m11, args) {
-    var varname = args[0] 
-    var fieldname = args[1] 
+    var varname = args[1] 
+    var fieldname = args[2] 
     var list = m11.scope[varname]
     if (!list) {
       return null
@@ -266,8 +270,8 @@ var mark11_commands = {
     }
   },
   hget: function (m11, args) {
-    var varname = args[0] 
-    var fieldname = args[1] 
+    var varname = args[1] 
+    var fieldname = args[2] 
     var hash = m11.scope[varname]
     if (!hash) {
       //m11.ret = null
@@ -279,41 +283,41 @@ var mark11_commands = {
     }
   },
   eq: function (m11, args) {
-    var evaled = mark11_eval_words(m11, args);
+    var evaled = mark11_eval_words(m11, args, 1);
     return (evaled[0] == evaled[1])
   },
   lt: function (m11, args) {
-    var evaled = mark11_eval_words(m11, args);
+    var evaled = mark11_eval_words(m11, args, 1);
     return (evaled[0] < evaled[1])
   },
   lte: function (m11, args) {
-    var evaled = mark11_eval_words(m11, args);
+    var evaled = mark11_eval_words(m11, args, 1);
     return (evaled[0] <= evaled[1])
   },
   gte: function (m11, args) {
-    var evaled = mark11_eval_words(m11, args);
+    var evaled = mark11_eval_words(m11, args, 1);
     return (evaled[0] >= evaled[1])
   },
   gt: function (m11, args) {
-    var evaled = mark11_eval_words(m11, args);
+    var evaled = mark11_eval_words(m11, args, 1);
     return (evaled[0] > evaled[1])
   },
   cat: function (m11, args) {
-    var evaled = mark11_eval_words(m11, args);
+    var evaled = mark11_eval_words(m11, args, 1);
     return evaled.join("")
   },
   cats: function (m11, args) {
-    var evaled = mark11_eval_words(m11, args);
+    var evaled = mark11_eval_words(m11, args, 1);
     return evaled.join(" ")
   },
   set: function (m11, args) {
-    var varname = args[0].value //note the name is not dynamic. 
-    var varvalue = mark11_eval_word(m11, args[1]) 
+    var varname = args[1].value //note the name is not dynamic. 
+    var varvalue = mark11_eval_word(m11, args[2]) 
     m11.scope[varname] = varvalue 
     return varvalue
   },
   rpush: function (m11, args) {
-    var evaled = mark11_eval_words(m11, args, 1)
+    var evaled = mark11_eval_words(m11, args, 2)
     var list = mark11_setup_var(m11, args, [])
     for (var i = 0; i < evaled.length; i ++) {
       list.push(evaled[i])
@@ -321,9 +325,9 @@ var mark11_commands = {
     return list
   },
   lset: function (m11, args) {
-    var varname = args[0] //note the name is not dynamic. 
-    var fieldname = mark11_eval_word(args[1])
-    var varvalue = mark11_eval_word(args[2]) 
+    var varname = args[1] //note the name is not dynamic. 
+    var fieldname = mark11_eval_word(args[2])
+    var varvalue = mark11_eval_word(args[3]) 
     var list = m11.scope[varname]
     if (!list) {
       list = []
@@ -333,9 +337,9 @@ var mark11_commands = {
     return varvalue
   },
   hset: function (m11, args) {
-    var varname = args[0] //note the name is not dynamic. 
-    var fieldname = mark11_eval_word(args[1])
-    var varvalue = mark11_eval_word(args[2]) 
+    var varname = args[1] //note the name is not dynamic. 
+    var fieldname = mark11_eval_word(args[2])
+    var varvalue = mark11_eval_word(args[3]) 
     var hash = m11.scope[varname]
     if (!hash) {
       hash = {}
@@ -349,8 +353,8 @@ var mark11_commands = {
     m11.scope_stack.push(m11.scope)
     m11.scope_type_stack.push(m11.scope_type)
 
-    var where = mark11_eval_word(m11, args[0])
-    var args2 = mark11_eval_words(m11, args, 1)
+    var where = mark11_eval_word(m11, args[1])
+    var args2 = mark11_eval_words(m11, args, 2)
 
     m11.line_index = where
     var scope = {}
@@ -362,15 +366,15 @@ var mark11_commands = {
     scope.d = args2[3]
   },
   "goto": function (m11, args) {
-    var where = mark11_eval_word(m11, args[0])
+    var where = mark11_eval_word(m11, args[1])
     m11.line_index = where
   },
   "callnoscope": function (m11, args) {
     m11.line_index_stack.push(m11.line_index) 
     //m11.scope_stack.push(m11.scope)
     m11.scope_type_stack.push(m11.scope_type)
-    var where = mark11_eval_word(m11, args[0])
-    var args2 = mark11_eval_words(m11, args, 1)
+    var where = mark11_eval_word(m11, args[1])
+    var args2 = mark11_eval_words(m11, args, 2)
     m11.line_index = where
     m11.scope_type = "callnoscope"
     m11.scope.a = args2[0]
@@ -391,42 +395,38 @@ var mark11_commands = {
     return m11.ret
   },
   "if": function (m11, args) {
-    var condition = mark11_eval_word(m11, args[0])
+    var condition = mark11_eval_word(m11, args[1])
     if (condition) {
-      m11.line_index_stack.push(m11.line_index) 
-      m11.scope_type_stack.push(m11.scope_type)
-      var where = mark11_eval_word(m11, args[1])
-      m11.line_index = where
-      m11.scope_type = "callnoscope"
-    } else {
       m11.line_index_stack.push(m11.line_index) 
       m11.scope_type_stack.push(m11.scope_type)
       var where = mark11_eval_word(m11, args[2])
       m11.line_index = where
       m11.scope_type = "callnoscope"
+    } else {
+      m11.line_index_stack.push(m11.line_index) 
+      m11.scope_type_stack.push(m11.scope_type)
+      var where = mark11_eval_word(m11, args[3])
+      m11.line_index = where
+      m11.scope_type = "callnoscope"
     }
   },
-  // cancel this, just doing loops in 'mark11' code
-  //"loop": function (m11, args) { 
-  //  var evaled = mark11_eval_words(m11, args)
-  //  var where = evaled[2]
-  //  for (var i = evaled[0]; i < evaled[1]; i++) {
-  //    m11.line_index = mark11_eval_word(m11, where)
-  //  }
-  //}
+  now: function () {
+    return Date.now() 
+  }
 }
 mark11_commands.log = mark11_commands.say
 
 var mark11_eval_line = function (m11, line) {
   var command_id = line[0].value
-  var args = line.slice(1) // todo: maybe optimize this so you can just pass the whole args
+  //var args = line.slice(1) // todo: maybe optimize this so you can just pass the whole args
 
   var command = mark11_commands[command_id];
   if (command) {
-    var ret = command(m11, args)
+    var ret = command(m11, line)
     m11.ret = ret 
-  } else {
-    
+    if (m11.scope) {
+      m11.scope.it = ret
+    }
   }
 }
 

@@ -84,6 +84,16 @@ main:
   loop 0 10 loop_it
   say :done_with_loopage!
 
+  now; as start
+  loop 0 100000 nothing
+  now; as end
+  subtr end start; as duration
+  cats :it_took_this_long_to_count duration; log it
+  subtr 10 2; as eight
+
+nothing:
+  set i a 
+
 loop_it:
   log a
 
@@ -103,6 +113,15 @@ say :its_true_and_should_be
 
 <script>
 var m11
+
+var s = Date.now()
+var b
+for (var i = 0; i < 100000; i++ ) {
+  b = i
+}
+var e = Date.now()
+console.log("it took this long to count "+ (e - s))
+
 var main = function () {
   var canvasEl = document.getElementById("canvas")
   
