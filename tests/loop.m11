@@ -1,0 +1,22 @@
+say :this_is_a_test
+
+
+add 100 200
+as three-hundred
+
+log three-hundred
+
+catsb LeSueur Drew
+say it
+
+list names drew aimee
+log names
+
+catsb:
+cat b :_ a
+
+catb:
+cat b a
+
+
+add_last_name:

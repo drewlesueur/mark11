@@ -1,0 +1,6 @@
+#!/usr/bin/env node
+var mark11 = require("./mark11.js")
+var fs = require("fs")
+var filename = process.argv[2]
+var contents = fs.readFileSync(filename).toString()
+mark11(contents)

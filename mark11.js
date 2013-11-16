@@ -34,7 +34,7 @@ function isNumber(n) {
 }
 
 var mark11_add_built_in_libraries = function (code) {
- code = code
+ code = code + "\n"
   + "loop:\n"
   + "set i a\n"
   + "set max b\n"
@@ -113,10 +113,10 @@ var mark11 = function (code, m11) {
   }
   //new_lines.push([{type: "symbol", value:"return"}])
   new_lines.push([mark11_commands["return"]])
-  console.log(lookup_table)
-  console.log("new lines")
-  console.log(new_lines)
-  console.log(JSON.stringify(new_lines))
+  //console.log(lookup_table)
+  //console.log("new lines")
+  //console.log(new_lines)
+  //console.log(JSON.stringify(new_lines))
 
   m11.line_index = (lookup_table["main"] + 1) || 0
   m11.lines = new_lines
@@ -132,7 +132,7 @@ var mark11 = function (code, m11) {
 
     m11.line_index += 1
   }
-  console.log("all done!")
+  //console.log("all done!")
   return m11.ret;
 }
 
@@ -212,6 +212,9 @@ var mark11_commands = {
     console.log(arg)
     return arg
   },
+  log: function (m11, args) {
+    mark11_commands.say(m11, args)
+  },
   alert: function (m11, args) {
     var arg = mark11_eval_word(m11, args[1])
     alert(arg)
@@ -258,7 +261,8 @@ var mark11_commands = {
   },
   list: function (m11, args) {
     var ret = []
-    m11.scope[args[1]] = []
+    var evaled = mark11_eval_words(m11, args, 2)
+    m11.scope[args[1].value] = evaled
     return ret
   },
   lget: function (m11, args) {
@@ -438,6 +442,16 @@ var mark11_setup_var = function (m11, args, default_) {
     m11.scope[name] = value
   }
   return value
+}
+
+
+if (typeof exports !== 'undefined') {
+  if (typeof module !== 'undefined' && module.exports) {
+    exports = module.exports = mark11;
+  }
+  exports.mark11 = mark11;
+} else {
+  this.mark11 = mark11;
 }
 
 /*
