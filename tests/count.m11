@@ -1,0 +1,21 @@
+now; as start_time
+log it
+
+set sum 0
+boom loop 0 1,000,000 add_it
+
+cats :done_here sum; say it
+
+now; as end_time
+
+subtr end_time start_time
+as diff
+
+cats :the_diff_is diff; say it
+
+add_it:
+add sum a
+as sum
+
+
+

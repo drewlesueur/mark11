@@ -29,8 +29,13 @@ var mark11_set_drawing_area = function (m11, canvasEl) {
   m11.canvas = canvasEl
 }
 
+var mark11_remove_commas = function (n) {
+  var n2 = n.replace(/,/g, "")
+  return n2
+}
 function isNumber(n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
+  var n2 = mark11_remove_commas(n)
+  return !isNaN(parseFloat(n2)) && isFinite(n2);
 }
 
 var mark11_add_built_in_libraries = function (code) {
@@ -100,6 +105,7 @@ var mark11 = function (code, m11) {
         } else if (word.substr(0, 1) == ":") {
           words[j] = {type: "string", value: word.substr(1).replace(/_/g, " ") }
         } else if (isNumber(word)) {
+          var word = mark11_remove_commas(word)
           words[j] = {type: "number", value: word - 0}
         } else {
           // the first one really ins't a symbol it's a command
@@ -422,6 +428,7 @@ var mark11_commands = {
   }
 }
 mark11_commands.log = mark11_commands.say
+mark11_commands.boom = mark11_commands.callnoscope // boomerang
 
 var mark11_eval_line = function (m11, line) {
   //var args = line.slice(1) // todo: maybe optimize this so you can just pass the whole args

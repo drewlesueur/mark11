@@ -12,6 +12,17 @@ say it
 list names drew aimee
 log names
 
+set sum 0
+boom loop 0 100 add_to_sum
+
+
+add_to_sum:
+log a
+add sum a
+as sum
+cats :sum_is sum
+say it
+
 catsb:
 cat b :_ a
 
