@@ -54,6 +54,7 @@ var mark11_add_built_in_libraries = function (code) {
   + "  if is_done loop_done loop_not_done\n"
   + "\n"
   + "loop_done:\n"
+  + "say :loop__done"
   + "\n"
   + "loop_not_done:\n"
   + "  add i 1; as i\n"
@@ -81,7 +82,7 @@ var mark11 = function (code, m11) {
       newI += 1
     }
   }
-
+  var original_lines = []
   var new_lines = []
   for (var i = 0; i < lines_length; i++) {
     var line = lines[i]
@@ -90,6 +91,7 @@ var mark11 = function (code, m11) {
     if (last_char == ":") {
       //new_lines.push([{type: "symbol", value: "return"}])
       new_lines.push([mark11_commands["return"]])
+      original_lines.push(line + "// return")
     } else if (line.length){
       var words = line.split(" ")
       var first_word = words[0]
@@ -115,10 +117,12 @@ var mark11 = function (code, m11) {
       }
       words[0] = mark11_commands[words[0].value] // yo
       new_lines.push(words)
+      original_lines.push(line)
     }
   }
   //new_lines.push([{type: "symbol", value:"return"}])
   new_lines.push([mark11_commands["return"]])
+  original_lines.push("return")
   //console.log(lookup_table)
   //console.log("new lines")
   //console.log(new_lines)
@@ -126,6 +130,7 @@ var mark11 = function (code, m11) {
 
   m11.line_index = (lookup_table["main"] + 1) || 0
   m11.lines = new_lines
+  m11.original_lines = original_lines
   while (true) {
 
     var line = new_lines[m11.line_index]
@@ -200,9 +205,10 @@ var mark11_commands = {
   add: function (m11, args) {
     args = mark11_eval_words(m11, args, 1)
     var sum = 0;
-    args.forEach(function (arg) {
-      sum += arg
-    })
+    var len = args.length
+    for (var i = 0; i < len; i++) {
+      sum += args[i]
+    }
     return sum
   }, 
   subtr: function (m11, args) {
